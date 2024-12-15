@@ -25,7 +25,7 @@ function Log() {
           </div>
         </div>
         <div className="div2">
-            <img src={logo} className="imglogo"/>
+            <img src={logo} className="imglogo" alt="logrede"/>
         </div>
       
 
