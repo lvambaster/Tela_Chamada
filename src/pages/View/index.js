@@ -44,7 +44,7 @@ function View() {
         localStorage.setItem('disableRemove', 'true');
         let width = 100;
         const interval = setInterval(() => {
-          width -= 1;
+          width -= 1.43;
           setTimerWidth(width);
         }, 100); // Reduzir a cada 100ms
 
@@ -53,7 +53,7 @@ function View() {
           setShowAnimation(false);
           localStorage.setItem('disableRemove', 'false'); // Habilitar remoção
           setTimerWidth(100); // Resetar barra
-        }, 10000); // Exibir por 10 segundos
+        }, 7000); // Exibir por 10 segundos
       }
     };
   
