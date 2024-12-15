@@ -4,11 +4,26 @@ import './style.css';
 function Operator() {
   const [lançar, setLançar] = useState('');
   const [saveValue, setSaveValue] = useState([]);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   // Carregar dados do localStorage ao montar o componente
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem('cliente')) || [];
     setSaveValue(savedData);
+
+    // Verificar se a exclusão está desabilitada
+    const disableState = localStorage.getItem('disableRemove') === 'true';
+    setIsDisabled(disableState);
+  }, []);
+
+  // Monitorar mudanças no estado de exclusão desabilitada
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const disableState = localStorage.getItem('disableRemove') === 'true';
+      setIsDisabled(disableState);
+    }, 500); // Verificar a cada 500ms
+
+    return () => clearInterval(interval);
   }, []);
 
   // Adicionar novo cliente ao estado e localStorage
@@ -30,15 +45,20 @@ function Operator() {
 
   // Remover cliente e salvar o nome removido no localStorage
   const handleRemove = (id, name) => {
-    const updatedValue = saveValue.filter((item) => item.id !== id); // Remover pelo ID
-    setSaveValue(updatedValue);
-    localStorage.setItem('cliente', JSON.stringify(updatedValue));
+    if (!isDisabled) {
+      const updatedValue = saveValue.filter((item) => item.id !== id); // Remover pelo ID
+      setSaveValue(updatedValue);
+      localStorage.setItem('cliente', JSON.stringify(updatedValue));
 
-    // Salvar o nome removido para a página View
-    localStorage.setItem('removedName', name);
+      // Salvar o nome removido para a página View
+      localStorage.setItem('removedName', name);
 
-    // Definir indicador de animação
-    localStorage.setItem('triggerAnimation', 'true');
+      // Definir indicador de animação
+      localStorage.setItem('triggerAnimation', 'true');
+
+      // Desabilitar exclusão
+      localStorage.setItem('disableRemove', 'true');
+    }
   };
 
   return (
@@ -64,7 +84,12 @@ function Operator() {
               {saveValue.map((cliente) => (
                 <li className="lista" key={cliente.id}>
                   {cliente.name}
-                  <button onClick={() => handleRemove(cliente.id, cliente.name)}>OK!</button>
+                  <button
+                    onClick={() => handleRemove(cliente.id, cliente.name)}
+                    disabled={isDisabled} // Desabilitar botão durante animação
+                  >
+                    OK!
+                  </button>
                 </li>
               ))}
             </ul>

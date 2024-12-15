@@ -12,6 +12,7 @@ function View() {
   const [saveValue, setSaveValue] = useState([]);
   const [removedName, setRemovedName] = useState('');
   const [showAnimation, setShowAnimation] = useState(false);
+  const [timerWidth, setTimerWidth] = useState(100);
 
   const settings = {
     dots: true,
@@ -38,9 +39,21 @@ function View() {
       if (trigger === 'true') {
         setShowAnimation(true);
         localStorage.removeItem('triggerAnimation');
+
+        // Iniciar barra de tempo e desabilitar remoção
+        localStorage.setItem('disableRemove', 'true');
+        let width = 100;
+        const interval = setInterval(() => {
+          width -= 1;
+          setTimerWidth(width);
+        }, 100); // Reduzir a cada 100ms
+
         setTimeout(() => {
+          clearInterval(interval);
           setShowAnimation(false);
-        }, 10000);
+          localStorage.setItem('disableRemove', 'false'); // Habilitar remoção
+          setTimerWidth(100); // Resetar barra
+        }, 10000); // Exibir por 10 segundos
       }
     };
   
@@ -48,18 +61,18 @@ function View() {
     const interval = setInterval(updateList, 1000);
     return () => clearInterval(interval);
   }, []);
-  
-  
 
   return (
     <div>
       {showAnimation && (
-  <div className="fixed-animation">
-    <h1 className="animation-text">
-      <div>FICOU PRONTO</div>
-      {removedName}</h1>
-  </div>
-)}
+        <div className="fixed-animation">
+          <div className="timer-bar" style={{ width: `${timerWidth}%` }} />
+          <h1 className="animation-text">
+            <div>FICOU PRONTO</div>
+            {removedName}
+          </h1>
+        </div>
+      )}
 
       <div className="divlogo">
         <img src={logo} className="imglogo" alt='logo'/>
